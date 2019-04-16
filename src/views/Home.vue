@@ -1,7 +1,14 @@
 <template>
   <div class="home">
-    <input v-model="search" type="text" name="Search" placeholder="Search" />
-    <button v-on:click="searchCompanies">Submit</button> {{ list }}
+    <!-- <label for="input">Companies:</label> -->
+    <!-- <input id="input" class="form-control" type="text" placeholder="Type to search..." /> -->
+    <!-- <typeahead v-model="search" target="#input" :data="list" item-key="name" /> -->
+    <!-- <alert v-show="search">You selected {{ search }}</alert> -->
+
+    <select>
+      <option v-for="company in companies">{{ company.Name }}</option>
+    </select>
+    <button v-on:click="searchCompanies">Search</button>
   </div>
 </template>
 
@@ -15,7 +22,7 @@ export default {
     return {
       companyNames: ["Apple", "Google", "Microsoft"],
       header: [],
-      list: [],
+      companies: [],
       search: ""
     };
   },
@@ -29,7 +36,7 @@ export default {
       // create new header array from first row of CSV data
       const header = rowData[0].replace(/\"/g, "").split(",");
       // create array of objects that have a key of headers linked to specific company information
-      const list = rowData.map(row => {
+      const companies = rowData.map(row => {
         // parse the rowData element to remove quotes ("") from the string
         // create new array which is an array containing arrays of each company's data
         const rowArray = row.replace(/\"/g, "").split(",");
@@ -42,8 +49,8 @@ export default {
         return obj;
       });
       // sets data list to array of company objects
-      this.list = list;
-      console.log(list);
+      this.companies = companies;
+      console.log(companies);
     });
   },
   methods: {
