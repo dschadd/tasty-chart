@@ -6,7 +6,7 @@
     <!-- <alert v-show="search">You selected {{ search }}</alert> -->
 
     <select v-model="search">
-      <option v-for="company in companies">{{ company.Name }}</option>
+      <option v-for="company in companies" v-bind:value="company.Symbol">{{ company.Name }}</option>
     </select>
     <button v-on:click="searchCompanies">Search</button>
   </div>
