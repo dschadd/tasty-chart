@@ -5,7 +5,7 @@
     <!-- <typeahead v-model="search" target="#input" :data="list" item-key="name" /> -->
     <!-- <alert v-show="search">You selected {{ search }}</alert> -->
 
-    <select>
+    <select v-model="search">
       <option v-for="company in companies">{{ company.Name }}</option>
     </select>
     <button v-on:click="searchCompanies">Search</button>
@@ -55,8 +55,8 @@ export default {
   },
   methods: {
     searchCompanies: function() {
-      const companyNames = this.companyNames;
-      console.log(companyNames);
+      const search = this.search;
+      console.log(search);
     }
   },
   computed: {}
