@@ -6,9 +6,12 @@
     <!-- <alert v-show="search">You selected {{ search }}</alert> -->
 
     <select v-model="search">
-      <option v-for="company in companies" v-bind:value="company.Symbol">{{ company.Name }}</option>
+      <option v-for="company in companies" v-bind:value="company">{{ company.Name }}</option>
     </select>
     <button v-on:click="searchCompanies">Search</button>
+
+    <h1>{{ search.Name }}</h1>
+    <h2>{{ search.Symbol }}</h2>
   </div>
 </template>
 
@@ -56,7 +59,8 @@ export default {
   methods: {
     searchCompanies: function() {
       const search = this.search;
-      console.log(search);
+      var priceData = axios.get("https://api.iextrading.com/1.0/stock/aapl/chart/1m");
+      console.log(priceData);
     }
   },
   computed: {}
