@@ -42,24 +42,7 @@ export default {
     highcharts: Chart
   },
   created() {
-    axios.get("./data.csv").then(res => {
-      const rowData = res.data.split("\n");
-
-      const header = rowData[0].replace(/"/g, "").split(",");
-
-      const companyData = rowData.slice(1, rowData.length);
-
-      const companies = companyData.map(row => {
-        const rowArray = row.replace(/"/g, "").split(",");
-        let obj = {};
-        header.forEach((key, i) => {
-          obj[key] = rowArray[i];
-        });
-        return obj;
-      });
-
-      this.companies = companies.filter(company => company.Name !== undefined);
-    });
+    this.getCompanies();
   },
   methods: {
     // Get array of company data objects
