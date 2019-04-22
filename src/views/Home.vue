@@ -1,26 +1,20 @@
 <!--
   TODO
   Fix variable names
-  Dynamic typeahead search
-  Chart candlestick price
   Ask Peter, Dan, and Jay what I can do to make the code better
-  Testing?z
+  Reduce libraries and dependencies
+  Testing?
 -->
 <template>
   <div class="home">
-    <!-- <label for="input">Companies:</label> -->
-    <!-- <input id="input" class="form-control" type="text" placeholder="Type to search..." /> -->
-    <!-- <typeahead v-model="search" target="#input" :data="list" item-key="name" /> -->
-    <!-- <alert v-show="search">You selected {{ search }}</alert> -->
+    <vue-bootstrap-typeahead
+      v-model="search"
+      :data="companies"
+      :serializer="company => `${company.Name} (${company.Symbol})`"
+      @hit="searchCompanies"
+    />
 
-    <select v-model="search">
-      <option v-for="company in companies" v-bind:value="company">{{ company.Name }}</option>
-    </select>
-    <button v-on:click="searchCompanies">Search</button>
-
-    <h1>{{ search.Name }}</h1>
-    <h2>{{ search.Symbol }}</h2>
-    <h2>${{ price }}</h2>
+    <highcharts :constructor-type="'stockChart'" :options="chartOptions"> </highcharts>
   </div>
 </template>
 
@@ -28,49 +22,106 @@
 
 <script>
 import axios from "axios";
+import VueBootstrapTypeahead from "vue-bootstrap-typeahead";
+import Highcharts from "highcharts";
+import stockInit from "highcharts/modules/stock";
+import { Chart } from "highcharts-vue";
+
+stockInit(Highcharts);
 
 export default {
-  data: function() {
+  data() {
     return {
-      companyNames: ["Apple", "Google", "Microsoft"],
       header: [],
       companies: [],
       search: "",
-      price: ""
+      price: "",
+      chartOptions: {
+        series: [
+          {
+            type: "candlestick",
+            data: []
+          }
+        ]
+      }
     };
   },
-  created: function() {
-    // TODO: remove empty last element of header array
-    // import the CSV of listed stocks
+  components: {
+    VueBootstrapTypeahead,
+    highcharts: Chart
+  },
+  created() {
     axios.get("./data.csv").then(res => {
-      // parse CSV to store separate companies as elements of an array
       const rowData = res.data.split("\n");
-      // parse the first element of the rowData array to remove quotes ("") from the string
-      // create new header array from first row of CSV data
+
       const header = rowData[0].replace(/"/g, "").split(",");
-      // create array of objects that have a key of headers linked to specific company information
-      const companies = rowData.map(row => {
-        // parse the rowData element to remove quotes ("") from the string
-        // create new array which is an array containing arrays of each company's data
+
+      const companyData = rowData.slice(1, rowData.length);
+
+      const companies = companyData.map(row => {
         const rowArray = row.replace(/"/g, "").split(",");
-        // initialize object for storing this item's data
         let obj = {};
-        // set each header's key value pair to corresponding company data
         header.forEach((key, i) => {
           obj[key] = rowArray[i];
         });
         return obj;
       });
-      // sets data list to array of company objects
-      this.companies = companies;
+
+      this.companies = companies.filter(company => company.Name !== undefined);
     });
   },
   methods: {
-    searchCompanies: function() {
-      const search = this.search;
-      axios.get(`https://api.iextrading.com/1.0/stock/${search.Symbol}/chart/1m`).then(res => {
-        this.price = res.data[0]["close"];
+    // Function to get array of company data objects
+    getCompanies() {
+      axios.get("./data.csv").then(res => {
+        this.companies = this.parseCompanies(res.data);
       });
+    },
+    parseCompanies(data) {
+      // Function to parse CSV from assets folder and return an array of
+      // objects with key-value pair of a header and company data
+      const rowData = data.split("\n");
+
+      const headers = rowData[0].replace(/"/g, "").split(",");
+
+      const companyData = rowData.slice(1, rowData.length);
+
+      const companies = companyData.map(row => {
+        const rowArray = row.replace(/"/g, "").split(",");
+        let obj = {};
+        headers.forEach((key, i) => {
+          obj[key] = rowArray[i];
+        });
+        return obj;
+      });
+      return companies.filter(company => company.Name !== undefined);
+    },
+    searchCompanies(value) {
+      const search = value;
+      const symbol = search.Symbol;
+      axios
+        .get(`https://api.iextrading.com/1.0/stock/${symbol}/chart/1y`)
+        .then(res => {
+          console.log(res.data);
+          this.fillData(res.data);
+        })
+        .catch(err => console.log("not found"));
+    },
+    fillData(data) {
+      const chartData = data.map(day => {
+        return [day.date, day.open, day.high, day.low, day.close];
+      });
+      console.log(chartData);
+
+      const chartOptions = {
+        series: [
+          {
+            type: "candlestick",
+            data: chartData // sample data
+          }
+        ]
+      };
+      this.chartOptions = chartOptions;
     }
   },
   computed: {}
