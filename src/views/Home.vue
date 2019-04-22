@@ -32,18 +32,9 @@ stockInit(Highcharts);
 export default {
   data() {
     return {
-      header: [],
       companies: [],
       search: "",
-      price: "",
-      chartOptions: {
-        series: [
-          {
-            type: "candlestick",
-            data: []
-          }
-        ]
-      }
+      chartOptions: {}
     };
   },
   components: {
@@ -71,14 +62,14 @@ export default {
     });
   },
   methods: {
-    // Function to get array of company data objects
+    // Get array of company data objects
     getCompanies() {
       axios.get("./data.csv").then(res => {
         this.companies = this.parseCompanies(res.data);
       });
     },
     parseCompanies(data) {
-      // Function to parse CSV from assets folder and return an array of
+      // Parse CSV from assets folder and return an array of
       // objects with key-value pair of a header and company data
       const rowData = data.split("\n");
 
@@ -96,28 +87,28 @@ export default {
       });
       return companies.filter(company => company.Name !== undefined);
     },
-    searchCompanies(value) {
-      const search = value;
+    searchCompanies(search) {
+      // API call to get yearly stock data for the searched company
       const symbol = search.Symbol;
       axios
         .get(`https://api.iextrading.com/1.0/stock/${symbol}/chart/1y`)
         .then(res => {
-          console.log(res.data);
           this.fillData(res.data);
         })
         .catch(err => console.log("not found"));
     },
     fillData(data) {
+      // Formats API data for Highcharts Candlestick chart and then
+      // fills chart options AND data
       const chartData = data.map(day => {
         return [day.date, day.open, day.high, day.low, day.close];
       });
-      console.log(chartData);
 
       const chartOptions = {
         series: [
           {
             type: "candlestick",
-            data: chartData // sample data
+            data: chartData
           }
         ]
       };
