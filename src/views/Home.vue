@@ -1,20 +1,23 @@
 <!--
   TODO
-  Fix variable names
-  Ask Peter, Dan, and Jay what I can do to make the code better
   Reduce libraries and dependencies
   Testing?
 -->
 <template>
   <div class="home">
-    <vue-bootstrap-typeahead
-      v-model="search"
-      :data="companies"
-      :serializer="company => `${company.Name} (${company.Symbol})`"
-      @hit="searchCompanies"
-    />
+    <h1>Tasty Chart</h1>
+    <p>Search for a stock!</p>
 
-    <highcharts :constructor-type="'stockChart'" :options="chartOptions"> </highcharts>
+    <div class="container">
+      <vue-bootstrap-typeahead
+        v-model="search"
+        :data="companies"
+        :serializer="company => `${company.Name} (${company.Symbol})`"
+        @hit="searchCompanies"
+      />
+    </div>
+
+    <div class="container"><highcharts :constructor-type="'stockChart'" :options="chartOptions"> </highcharts></div>
   </div>
 </template>
 
@@ -34,7 +37,17 @@ export default {
     return {
       companies: [],
       search: "",
-      chartOptions: {}
+      chartOptions: {
+        rangeSelector: {
+          enabled: false
+        },
+        scrollbar: {
+          enabled: false
+        },
+        navigator: {
+          enabled: false
+        }
+      }
     };
   },
   components: {
@@ -74,13 +87,13 @@ export default {
       // API call to get yearly stock data for the searched company
       const symbol = search.Symbol;
       axios
-        .get(`https://api.iextrading.com/1.0/stock/${symbol}/chart/1y`)
+        .get(`https://api.iextrading.com/1.0/stock/${symbol}/chart/1m`)
         .then(res => {
-          this.fillData(res.data);
+          this.fillChartData(res.data);
         })
         .catch(err => console.log("not found"));
     },
-    fillData(data) {
+    fillChartData(data) {
       // Formats API data for Highcharts Candlestick chart and then
       // fills chart options AND data
       const chartData = data.map(day => {
@@ -88,6 +101,28 @@ export default {
       });
 
       const chartOptions = {
+        title: {
+          text: `${this.search}`
+        },
+        rangeSelector: {
+          enabled: false
+        },
+        scrollbar: {
+          enabled: false
+        },
+        navigator: {
+          enabled: false
+        },
+        xAxis: {
+          labels: {
+            enabled: false
+          }
+        },
+        yAxis: {
+          labels: {
+            format: "${value}"
+          }
+        },
         series: [
           {
             type: "candlestick",
