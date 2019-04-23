@@ -24,4 +24,4 @@ npm install
 npm run serve
 ```
 
-Navigate to http://localhost:8080/#/ in your browser.
+Navigate to http://localhost:8080/#/ in your browser to view the web application and to begin searching!
