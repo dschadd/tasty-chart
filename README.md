@@ -1,6 +1,20 @@
 # tasty-chart
 
-## Project setup
+This codebase was created to demonstrate my ability as a front end dev. Built with Vue.js including dynamic Bootstrap search and the Highcharts library.
+
+### Project setup
+
+In your terminal, clone the repository
+```
+https://github.com/dschadd/tasty-chart.git
+```
+
+### Navigate to the tasty-chart folder
+```
+cd tasty-chart
+```
+
+### Install dependencies
 ```
 npm install
 ```
@@ -10,21 +24,4 @@ npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
-# tasty-chart
+Navigate to http://localhost:8080/#/ in your browser.
