@@ -1,7 +1,6 @@
 <!--
   TODO
-  Reduce libraries and dependencies
-  Testing?
+  Testing
 -->
 <template>
   <div class="home">
@@ -17,7 +16,9 @@
       />
     </div>
 
-    <div class="container"><highcharts :constructor-type="'stockChart'" :options="chartOptions"> </highcharts></div>
+    <div v-if="search" class="container">
+      <highcharts :constructor-type="'stockChart'" :options="chartOptions"> </highcharts>
+    </div>
   </div>
 </template>
 
